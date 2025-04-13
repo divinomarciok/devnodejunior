@@ -1,0 +1,20 @@
+{
+  "name": "cep_manager_nodee",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-mock": "^29.7.0"
+  },
+  "dependencies": {
+    "env": "^0.0.2",
+    "mongodb": "^6.15.0"
+  }
+}
