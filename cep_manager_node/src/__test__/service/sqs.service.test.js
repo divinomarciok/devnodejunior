@@ -1,6 +1,5 @@
 const { SQSClient, ReceiveMessageCommand, DeleteMessageBatchCommand } = require('@aws-sdk/client-sqs');
-const { sqsMonitor, deleteMessageQueue } = require('../../service/sqs.service'); // Ajuste o caminho para seu arquivo
-
+const { sqsMonitor, deleteMessageQueue } = require('../../service/sqs.service');
 
 jest.mock('@aws-sdk/client-sqs');
 
@@ -132,10 +131,9 @@ describe('Teste classe SQS Monitor', () => {
         ]);
     });
     
-    it('Deve tratar erro ao excluir mensagens', async () => {
- 
-        const mockMessages = [{ MessageId: 'msg1', ReceiptHandle: 'receipt1' }];        
-   
+    it('Deve tratar erro ao excluir mensagens', async () => { 
+
+        const mockMessages = [{ MessageId: 'msg1', ReceiptHandle: 'receipt1' }];       
         const mockError = new Error('Erro de teste na exclusão');
 
         SQSClient.prototype.send.mockRejectedValueOnce(mockError);        

@@ -1,7 +1,5 @@
-// test/checkCepApi.test.js
-
 const axios = require('axios');
-const checkCepApi = require('../../service/api.service'); // Ajuste o caminho conforme necessário
+const checkCepApi = require('../../service/api.service'); 
 
 jest.mock('axios');
 

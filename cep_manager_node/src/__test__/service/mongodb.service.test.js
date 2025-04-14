@@ -1,8 +1,8 @@
-const DbService = require('../../service/mongodb.service'); // Ajuste o caminho conforme necessário
+const DbService = require('../../service/mongodb.service'); 
 const { ObjectId } = require('mongodb');
 
 describe('Teste classe DbService', () => {
-    // Variáveis para testes
+   
     const collectionName = 'test_collection';
     let testDocId;
     let testDoc;
