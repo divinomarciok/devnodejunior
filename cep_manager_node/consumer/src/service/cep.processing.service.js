@@ -1,6 +1,6 @@
-const dbService = require('../service/mongodb.service');
+const dbService = require('./mongodb.service');
 const checkCepApi = require('./api.service');
-const { sqsMonitor, deleteMessageQueue } = require('../service/sqs.service');
+const { sqsMonitor, deleteMessageQueue } = require('./sqs.service');
 const {getvalueKey} = require ('../utilities/utilities');
 
 async function cepProcessing() {
@@ -113,6 +113,14 @@ async function atualizarRegistro(collectionName, id, dataRecord) {
     } catch (error) {
         console.error('Erro ao atualizar o registro:', error);
     }
+}
+
+function getvalueKey(body,key){
+
+    body  = JSON.parse(body);
+    const cep = body[key];
+    console.log(cep);
+    return cep;
 }
 
 setInterval(cepProcessing, 5000);

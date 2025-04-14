@@ -1,7 +1,9 @@
-const { SQSClient, ReceiveMessageCommand, DeleteMessageBatchCommand } = require('@aws-sdk/client-sqs');
+const {SendMessageCommand,SQSClient, ReceiveMessageCommand, DeleteMessageBatchCommand } = require('@aws-sdk/client-sqs');
+require('dotenv').config();
 
-const queueURL = 'https://sqs.sa-east-1.amazonaws.com/623360491589/cep_manager_queue';
-const region =  'sa-east-1' 
+const queueURL = process.env.QUEUEURL;
+const region =  process.env.REGION;
+
 const sqsClient = new SQSClient({ region });
 
 async function sqsMonitor() {
@@ -52,11 +54,27 @@ async function deleteMessageQueue(messages) {
     if (deleteResult.Failed) {
       console.error('Erros ao excluir mensagens ', deleteResult.Failed);
     }
-  } catch (err) {
+  } catch (err) {a
     console.error('Erro ao excluir lote de mensagens ', err);
   }
 }
 
+async function sendMessageQueue(messageBody) {
+  const sendParams = {
+    QueueUrl: queueURL,
+    MessageBody: JSON.stringify(messageBody),
+  };
+
+  try {
+    const sendCommand = new SendMessageCommand(sendParams);
+    const sendResult = await sqsClient.send(sendCommand);
+    //console.log(`[${new Date().toLocaleString()}] Mensagem enviada para a fila <CEP_MANAGER_QUEUE>`, sendResult);
+    return sendResult;
+  } catch (err) {
+    console.error('Erro ao enviar mensagem para a fila <CEP_MANAGER_QUEUE>:', err);
+    return null;
+  }
+}
 console.log('Serviço de monitoramento de fila SQS iniciado');
 
-module.exports = { deleteMessageQueue, sqsMonitor };
+module.exports = {sendMessageQueue, deleteMessageQueue, sqsMonitor };

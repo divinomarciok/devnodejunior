@@ -16,6 +16,8 @@ describe('Teste classe DbService', () => {
             createdAt: new Date()
         };
         await DbService.connect();
+        const result = await DbService.insert(collectionName, testDoc);
+      
     });
 
     afterAll(async () => {
