@@ -73,6 +73,24 @@ class DbService {
       { $set: userData }
     );
   }
+
+  async updateById(collectionName, id, updateData, options = {}) {
+    
+    if (!this.db) {
+      await this.connect();
+    }
+    const collection = await this.getCollection(collectionName);
+    const objectId = new ObjectId(id);
+    const result = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: updateData },
+      { returnDocument: 'after', ...options } //
+    );
+    return result.value; 
+  }
 }
+
+ 
+  
 
 module.exports = new DbService();

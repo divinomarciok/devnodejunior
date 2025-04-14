@@ -5,4 +5,12 @@ function removeHifen(cep){
     return cep.replace(/[^0-9]/g,'');
 }
 
-module.exports = removeHifen;
+function getvalueKey(body,key){
+
+    body  = JSON.parse(body);
+    const cep = body[key];
+    console.log(cep);
+    return cep;
+}
+
+module.exports = {removeHifen,getvalueKey};

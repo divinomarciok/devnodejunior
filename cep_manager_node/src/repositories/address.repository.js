@@ -1,6 +1,4 @@
-const { MongoClient } = require('mongodb');
 const dbService = require('../service/mongodb.service');
-const Address = require('../model/Addres');
 
 const addressJson = {
   cep: '12345-678',
@@ -23,6 +21,7 @@ const COLLECTION_NAME = 'Address';
 async function saveAddress(addressData) {
   try {
     const result = await dbService.create(COLLECTION_NAME, addressData);
+    //console.log(result.insertedId);
      return result;
   } catch (error) {
     console.error('Erro ao salvar endereço:', error);
