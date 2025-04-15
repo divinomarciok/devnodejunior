@@ -1,5 +1,5 @@
 const axios = require('axios');
-const checkCepApi = require('../../service/api.service'); 
+const checkCepApi = require('../../services/api.service'); 
 
 jest.mock('axios');
 
@@ -36,7 +36,7 @@ describe('Teste da função checkCepApi', () => {
         expect(result.localidade).toBe('Rio Verde');
     });
 
-    it('Deve retornar null se o CEP for inválido (erro na resposta)', async () => {
+    it('Deve retornar null se o CEP for inválido erro na resposta', async () => {
         const mockResponse = {
             status: 200,
             data: { erro: true },
@@ -48,10 +48,18 @@ describe('Teste da função checkCepApi', () => {
         expect(result).toBeNull();
     });
 
-    it('Deve retornar null se a API retornar um erro HTTP', async () => {
-        axios.get.mockRejectedValue(new Error('Erro de rede'));
 
-        const result = await checkCepApi('99999999');
+    it('Deve retornar null se a API retornar um erro HTTP com status 400', async () => {
+        axios.get.mockRejectedValue({
+          isAxiosError: true, 
+          response: {
+            status: 400,
+            data: { mensagem: 'CEP inválido' },
+          },
+        });
+        
+      
+        const result = await checkCepApi('00000000'); 
         expect(result).toBeNull();
-    });
+      });
 });

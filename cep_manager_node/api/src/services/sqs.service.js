@@ -68,7 +68,9 @@ async function sendMessageQueue(messageBody) {
   try {
     const sendCommand = new SendMessageCommand(sendParams);
     const sendResult = await sqsClient.send(sendCommand);
-    console.log(`[${new Date().toLocaleString()}] Mensagem enviada para a fila <CEP_MANAGER_QUEUE>`, sendResult);
+    //console.log(`[${new Date().toLocaleString()}] Mensagem enviada para a fila <CEP_MANAGER_QUEUE>`, sendResult);
+    console.log(`[${new Date().toLocaleString()}] Mensagem enviada para a fila <CEP_MANAGER_QUEUE> \n id: `, sendResult.MessageId);
+
     return sendResult;
   } catch (error) {
   //  console.error('Erro ao enviar mensagem para a fila <CEP_MANAGER_QUEUE>:', error);

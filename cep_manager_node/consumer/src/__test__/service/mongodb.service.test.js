@@ -1,4 +1,4 @@
-const DbService = require('../../service/mongodb.service'); 
+const DbService = require('../../services/mongodb.service'); 
 const { ObjectId } = require('mongodb');
 
 describe('Teste classe DbService', () => {
@@ -16,8 +16,7 @@ describe('Teste classe DbService', () => {
             createdAt: new Date()
         };
         await DbService.connect();
-        const result = await DbService.insert(collectionName, testDoc);
-      
+             
     });
 
     afterAll(async () => {

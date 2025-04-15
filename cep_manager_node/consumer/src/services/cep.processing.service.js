@@ -1,16 +1,17 @@
 const dbService = require('./mongodb.service');
 const checkCepApi = require('./api.service');
 const { sqsMonitor, deleteMessageQueue } = require('./sqs.service');
-const {getvalueKey} = require ('../utilities/utilities');
+const { ObjectId } = require('mongodb'); // Importe ObjectId aqui
+
+
 
 async function cepProcessing() {
     try {
 
         const dataQueue = await sqsMonitor();
         if (dataQueue != null) {
-            const sucessoHandles = await processarLoteDeMensagens(dataQueue);
-            await deleteMessageQueue(sucessoHandles);
-        }
+            const sucessoHandles = await processMessageLote(dataQueue);
+            await deleteMessageQueue(sucessoHandles);        }
 
     } catch (error) {
         console.error("Erro ao resolver mensagem da fila : ", error)
@@ -19,24 +20,22 @@ async function cepProcessing() {
 
 }
 
-async function updateDataCepMongoDb(Address, id, dataCep) {
+async function updateDataCepMongoDb(collection, id, dataCep) {
 
     try {
-        const dataCepRefresh = await Cep.updateById(Address,
-            id,
-            {
-                data: dataCep,
-                status: 'CONCLUIDO'
-            },
-            { new: true }
-        );
 
-        if (dataCepRefresh) {
-            console.log('registro atualizado')
-            return dataCepRefresh;
-        } else {
-            console.log('erro ao atualizar');
-        }
+        const objectId = new ObjectId(id);
+        console.log("objectid >> ",objectId)
+        const dataCepRefresh = await dbService.updateById(collection, objectId, dataCep, { new: true });
+
+        console.log("cep atualizado", dataCepRefresh);
+       // if (dataCepRefresh) {
+       //     console.log('registro atualizado')
+       //     return dataCepRefresh;
+       // } else {
+       //     console.log('erro ao atualizar');
+       //
+       // }
 
 
     } catch (error) {
@@ -47,7 +46,8 @@ async function updateDataCepMongoDb(Address, id, dataCep) {
 
 }
 
-async function createObjectUpdte(cepData) {
+
+function createObjectUpdte(cepData) {
 
     if (cepData != null) {
         const jsonAtualizado =
@@ -68,18 +68,25 @@ async function createObjectUpdte(cepData) {
 
 }
 
-async function processarLoteDeMensagens(mensagens) {
+async function processMessageLote(mensagens) {
     if (mensagens.length > 0) {
 
         console.log(`Total de ${mensagens.length} mensagens para processar neste lote.`);
 
         mensagens.map(async (message) => {
         
-            const cep = getvalueKey(message.Body,"cep");          
+            const cep = getvalueKey(message.Body,"cep");    
+            const id =  getvalueKey(message.Body,"id");
+            console.log('pegou o id no map',id);
             const cepData = await checkCepApi(cep);
             const dataUpdate = createObjectUpdte(cepData);
 
-            console.log(dataUpdate);        
+            const update = await updateDataCepMongoDb(process.env.COLECTIONNAME,id,dataUpdate);
+            if(update){
+                console.log(update.value);
+                console.log(update);
+            }
+           
         })
 
 
@@ -123,4 +130,6 @@ function getvalueKey(body,key){
     return cep;
 }
 
-setInterval(cepProcessing, 5000);
+//setInterval(cepProcessing, 5000);
+
+module.exports= cepProcessing;

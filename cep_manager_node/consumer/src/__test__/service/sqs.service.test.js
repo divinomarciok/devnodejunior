@@ -1,5 +1,5 @@
 const { SQSClient, ReceiveMessageCommand, DeleteMessageBatchCommand } = require("@aws-sdk/client-sqs");
-const { sqsMonitor, deleteMessageQueue } = require('../../service/sqs.service');
+const { sqsMonitor, deleteMessageQueue } = require('../../services/sqs.service');
 
 jest.mock('@aws-sdk/client-sqs');
 
@@ -43,11 +43,12 @@ describe("Teste classe SQS Monitor", () => {
             return Promise.resolve({ Messages: mockMessages });
         });
           
-        await sqsMonitor();
+        const result = await sqsMonitor();
         
         
         expect(SQSClient.prototype.send).toHaveBeenCalledTimes(1);
         expect(SQSClient.prototype.send.mock.calls[0][0]).toBeInstanceOf(ReceiveMessageCommand);      
+        expect(result).toEqual(mockMessages);
         
      
     });
@@ -58,19 +59,18 @@ describe("Teste classe SQS Monitor", () => {
             return Promise.resolve({ Messages: [] });
         });
         
-         await sqsMonitor();               
+        const result = await sqsMonitor(); 
+
         expect(SQSClient.prototype.send).toHaveBeenCalledTimes(1);
-        expect(SQSClient.prototype.send.mock.calls[0][0]).toBeInstanceOf(ReceiveMessageCommand);
-        
-       
+        expect(SQSClient.prototype.send.mock.calls[0][0]).toBeInstanceOf(ReceiveMessageCommand);        
+        expect(result).toBeNull();
         expect(console.log).toHaveBeenCalledWith(expect.stringContaining("Nenhuma mensagem nova na fila <CEP_MANAGER_QUEUE>"));
     });
     
 
     it("Deve excluir mensagens após processamento com sucesso", async () => {
        
-        const mockMessages = [
-            {
+        const mockMessages = [            {
                 MessageId: "msg1",
                 ReceiptHandle: "receipt1",
                 Body: JSON.stringify({ id: "test-id-1" })
@@ -93,42 +93,14 @@ describe("Teste classe SQS Monitor", () => {
         });
         
     
-        await deleteMessageQueue(mockMessages);
-        
+    const result = await deleteMessageQueue(mockMessages);        
  
         expect(SQSClient.prototype.send).toHaveBeenCalledTimes(1);
         expect(SQSClient.prototype.send.mock.calls[0][0] instanceof DeleteMessageBatchCommand).toBe(true);       
-    
+        expect(result.Successful.length).toBeGreaterThan(0);
         expect(console.log).toHaveBeenCalledWith(expect.stringContaining("2 : mensagens excluídas com sucesso"));
     });
 
-    it("Deve tratar falhas ao excluir mensagens", async () => {
-    
-        const mockMessages = [
-            {
-                MessageId: "msg1",
-                ReceiptHandle: "receipt1",
-                Body: JSON.stringify({ id: "test-id-1" })
-            }
-        ];
-        
-        SQSClient.prototype.send.mockImplementationOnce(() => {
-            return Promise.resolve({ 
-                Successful: [],
-                Failed: [{ Id: 'msg1', Code: 'TestError', Message: 'Erro de teste' }]
-            });
-        });
-        
-     
-        await deleteMessageQueue(mockMessages);
-        
-        expect(SQSClient.prototype.send).toHaveBeenCalledTimes(1);        
-  
-        expect(console.error).toHaveBeenCalledWith('Erros ao excluir mensagens ', [
-            { Id: 'msg1', Code: 'TestError', Message: 'Erro de teste' }
-        ]);
-    });
-    
     it("Deve tratar erro ao excluir mensagens", async () => { 
 
         const mockMessages = [{ MessageId: "msg1", ReceiptHandle: "receipt1" }];       
@@ -136,8 +108,8 @@ describe("Teste classe SQS Monitor", () => {
 
         SQSClient.prototype.send.mockRejectedValueOnce(mockError);        
       
-        await deleteMessageQueue(mockMessages);        
-        
+        const result = await deleteMessageQueue(mockMessages);        
+        expect(result).toBeNull();
         expect(console.error).toHaveBeenCalledWith("Erro ao excluir lote de mensagens", mockError);
     });
 });

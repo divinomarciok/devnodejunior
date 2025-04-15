@@ -35,7 +35,7 @@ async function registerAndQueue(req, res) {
     } catch (error) {
         console.error("Error Controller : ", error);
         res.json({
-            error: "Error no bloco try"
+            error: "Error no bloco try do controller"
         })
     }
 }
