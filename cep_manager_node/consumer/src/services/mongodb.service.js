@@ -3,7 +3,7 @@ const dbConfig = require('../config/mongodb.config');
 
 class DbService {
   constructor() {
-    this.client = new MongoClient(dbConfig.uri, dbConfig.options);
+    this.client = new MongoClient(dbConfig.uri);
     this.dbName = dbConfig.uri.split('/').pop();
     this.db = null;
   }
@@ -27,6 +27,7 @@ class DbService {
     if (!this.db) {
       await this.connect();
     }
+
     return this.db.collection(collectionName);
   }
 
@@ -73,6 +74,35 @@ class DbService {
       { $set: userData }
     );
   }
+
+  async updateById(collectionName, id, updateData, options = {}) {
+    
+    try{
+
+      if (!this.db) {
+        await this.connect();
+      }
+  
+      const collection = await this.getCollection(collectionName);
+      console.log('nome collection ', collectionName);
+      //console.log("colecione" , collection);
+      const objectId =id;
+      const result = await collection.findOneAndUpdate(
+        { _id: objectId },
+        { $set: updateData },
+        { returnDocument: 'after', ...options } 
+      );
+      //console.log(result);
+      return result;
+
+    }catch(error){
+      console.error(error);
+    }
+ 
+  }
 }
+
+ 
+  
 
 module.exports = new DbService();

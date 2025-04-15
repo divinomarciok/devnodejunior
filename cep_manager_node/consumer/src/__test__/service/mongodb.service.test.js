@@ -1,8 +1,8 @@
-const DbService = require('../../service/mongodb.service'); // Ajuste o caminho conforme necessário
+const DbService = require('../../services/mongodb.service'); 
 const { ObjectId } = require('mongodb');
 
 describe('Teste classe DbService', () => {
-    // Variáveis para testes
+   
     const collectionName = 'test_collection';
     let testDocId;
     let testDoc;
@@ -16,6 +16,7 @@ describe('Teste classe DbService', () => {
             createdAt: new Date()
         };
         await DbService.connect();
+             
     });
 
     afterAll(async () => {

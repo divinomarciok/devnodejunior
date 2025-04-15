@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node src/consumer.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,10 @@
     "jest-mock": "^29.7.0"
   },
   "dependencies": {
+    "@aws-sdk/client-sqs": "^3.787.0",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.8.4",
+    "dotenv": "^16.5.0",
     "env": "^0.0.2",
     "mongodb": "^6.15.0"
   }
